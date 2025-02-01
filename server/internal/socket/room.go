@@ -1,23 +1,38 @@
 package socket
 
+import (
+	"sync"
+
+	"github.com/google/uuid"
+)
+
 type Room struct {
-	clients   map[string]*Client
-	game      *Game
-	broadcast chan []byte
+	Id        string
+	Name      string
+	Clients   map[string]*Client
+	Game      *Game
+	Broadcast chan []byte
+	mut       sync.Mutex
 }
 
-func newRoom() *Room {
+func NewRoom(name string) *Room {
 	return &Room{
-		clients: make(map[string]*Client),
-		game:    newGame(),
+		Id:      uuid.New().String(),
+		Name:    name,
+		Clients: make(map[string]*Client),
+		Game:    newGame(),
 	}
 }
 
-func (r *Room) addClient(c *Client) {
-	r.clients[c.id] = c
+func (r *Room) AddClient(c *Client) {
+	r.mut.Lock()
+	r.Clients[c.id] = c
+	r.mut.Unlock()
 }
 
-func (r *Room) removeClient(c *Client) {
+func (r *Room) RemoveClient(c *Client) {
 	c.roomId = ""
-	delete(r.clients, c.id)
+	r.mut.Lock()
+	delete(r.Clients, c.id)
+	r.mut.Unlock()
 }

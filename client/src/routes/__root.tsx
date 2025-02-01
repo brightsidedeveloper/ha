@@ -1,12 +1,18 @@
 import { QueryClient } from '@tanstack/react-query'
 import { Outlet, createRootRouteWithContext } from '@tanstack/react-router'
+import { Toaster } from 'react-hot-toast'
 
 export const Route = createRootRouteWithContext<QueryContext>()({
   component: RootComponent,
 })
 
 function RootComponent() {
-  return <Outlet />
+  return (
+    <>
+      <Outlet />
+      <Toaster />
+    </>
+  )
 }
 
 export type QueryContext = {
